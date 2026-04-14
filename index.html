@@ -1,9 +1,36 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Mega Quiz</title>
+    <style>
+        body { margin: 0; background: #0f0f0f; overflow: hidden; font-family: sans-serif; }
+        
+        /* אנימציית רעידה לתשובה שגויה */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        /* אנימציית קפיצה לתשובה נכונה */
+        @keyframes success {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .shake { animation: shake 0.2s ease-in-out 2; }
+        .success { animation: success 0.2s ease-in-out 1; }
+    </style>
+</head>
+<body>
+
+<script>
 (function() {
-    const old = document.getElementById('mc_mega_quiz_final');
-    if (old) old.remove();
     const game = document.createElement('div');
     game.id = 'mc_mega_quiz_final';
-    game.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0f0f0f;color:white;z-index:1000000;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:sans-serif;direction:rtl;user-select:none;overflow:hidden;';
+    game.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0f0f0f;color:white;z-index:1000000;display:flex;flex-direction:column;align-items:center;justify-content:center;user-select:none;direction:rtl;';
     document.body.appendChild(game);
 
     const quiz = [
@@ -40,35 +67,38 @@
             <div style="position:absolute;top:20px;left:20px;font-size:20px;background:#333;padding:10px;border-radius:10px;">XP: ${score} ✨</div>
             <h2 style="color:#888;">שלב ${step+1} מתוך ${quiz.length}</h2>
             <h1 style="margin:10px;font-size:30px;">איך אומרים <span style="color:#f1c40f;">${cur.h}</span>?</h1>
-            <div style="font-size:90px;background:#222;padding:30px;border-radius:20px;margin:20px;box-shadow: 0 0 20px rgba(0,0,0,0.5);">${cur.i}</div>
+            <div id="emoji-container" style="font-size:90px;background:#222;padding:30px;border-radius:20px;margin:20px;box-shadow: 0 0 20px rgba(0,0,0,0.5);">${cur.i}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:320px;">
-                ${opts.map(o => `<button class="gb" style="padding:15px;cursor:pointer;background:#444;color:white;border:2px solid #666;font-weight:bold;border-radius:8px;">${o}</button>`).join('')}
+                ${opts.map(o => `<button class="gb" style="padding:15px;cursor:pointer;background:#444;color:white;border:2px solid #666;font-weight:bold;border-radius:8px;transition:0.2s;">${o}</button>`).join('')}
             </div>`;
 
         game.querySelectorAll('.gb').forEach(b => {
             b.onclick = () => {
+                const container = document.getElementById('emoji-container');
                 if (b.innerText === cur.e) {
                     score++;
                     b.style.background = "#2ecc71";
+                    container.classList.add('success');
                 } else {
                     b.style.background = "#e74c3c";
+                    container.classList.add('shake');
                 }
-                setTimeout(() => { step++; draw(); }, 250);
+                setTimeout(() => { step++; draw(); }, 400);
             };
         });
     }
 
     function end() {
         game.innerHTML = `
-            <div style="text-align:center; animation: fadeIn 1s ease-in;">
-                <h1 style="font-size:120px; margin:0; background: linear-gradient(45deg, #f1c40f, #e67e22); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(241,196,15,0.5));">67</h1>
-                <p style="font-size:24px; color:#aaa; margin-top:-10px;">VIBE CHECK PASSED</p>
-                <p style="font-size:28px; margin:20px 0;">צברת ${score} נקודות XP!</p>
-                <button id="restart-btn" style="padding:15px 40px; cursor:pointer; font-size:18px; font-weight:bold; background:white; color:black; border:none; border-radius:50px; transition: 0.3s; box-shadow: 0 4px 15px rgba(255,255,255,0.2);">סיבוב נוסף 🔥</button>
+            <div style="text-align:center; animation: fadeIn 1s ease-out;">
+                <h1 style="font-size:140px; margin:0; line-height:1; background: linear-gradient(45deg, #f1c40f, #e67e22); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(241,196,15,0.6));">67</h1>
+                <p style="font-size:24px; color:#aaa; margin: 10px 0;">VIBE CHECK PASSED</p>
+                <p style="font-size:28px; margin-bottom:30px;">צברת ${score} נקודות XP!</p>
+                <button id="restart-btn" style="padding:18px 45px; cursor:pointer; font-size:20px; font-weight:bold; background:white; color:black; border:none; border-radius:50px; transition: 0.3s; box-shadow: 0 4px 20px rgba(255,255,255,0.15);">סיבוב נוסף 🔥</button>
             </div>
             <style>
-                @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-                #restart-btn:hover { transform: scale(1.05); background: #f1c40f; }
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+                #restart-btn:hover { transform: scale(1.1); background: #f1c40f; }
             </style>`;
         
         document.getElementById('restart-btn').onclick = () => {
@@ -78,3 +108,7 @@
 
     draw();
 })();
+</script>
+
+</body>
+</html>
