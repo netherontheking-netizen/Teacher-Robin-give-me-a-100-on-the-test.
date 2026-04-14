@@ -1,0 +1,80 @@
+(function() {
+    const old = document.getElementById('mc_mega_quiz_final');
+    if (old) old.remove();
+    const game = document.createElement('div');
+    game.id = 'mc_mega_quiz_final';
+    game.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0f0f0f;color:white;z-index:1000000;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:sans-serif;direction:rtl;user-select:none;overflow:hidden;';
+    document.body.appendChild(game);
+
+    const quiz = [
+        { h: "סירה", e: "Boat", i: "🛶" }, { h: "חרב", e: "Sword", i: "⚔️" }, { h: "יהלום", e: "Diamond", i: "💎" },
+        { h: "תפוח", e: "Apple", i: "🍎" }, { h: "קשת", e: "Bow", i: "🏹" }, { h: "מכוש", e: "Pickaxe", i: "⛏️" },
+        { h: "מיטה", e: "Bed", i: "🛌" }, { h: "לחם", e: "Bread", i: "🍞" }, { h: "חץ", e: "Arrow", i: "🎯" },
+        { h: "פעמון", e: "Bell", i: "🔔" }, { h: "ברזל", e: "Iron", i: "⛓️" }, { h: "פחם", e: "Coal", i: "🌑" },
+        { h: "לפיד", e: "Torch", i: "🔦" }, { h: "תיבה", e: "Chest", i: "📦" }, { h: "חכה", e: "Fishing Rod", i: "🎣" },
+        { h: "מפה", e: "Map", i: "🗺️" }, { h: "מצפן", e: "Compass", i: "🧭" }, { h: "שעון", e: "Clock", i: "⏰" },
+        { h: "דלי", e: "Bucket", i: "🪣" }, { h: "מספריים", e: "Shears", i: "✂️" }, { h: "תרנגולת", e: "Chicken", i: "🐔" },
+        { h: "פרה", e: "Cow", i: "🐄" }, { h: "עכביש", e: "Spider", i: "🕷️" }, { h: "זאב", e: "Wolf", i: "🐺" },
+        { h: "דבורה", e: "Bee", i: "🐝" }, { h: "דג", e: "Fish", i: "🐟" }, { h: "עוגה", e: "Cake", i: "🎂" },
+        { h: "עוגייה", e: "Cookie", i: "🍪" }, { h: "דלת", e: "Door", i: "🚪" }, { h: "סולם", e: "Ladder", i: "🪜" },
+        { h: "סדן", e: "Anvil", i: "🔨" }, { h: "דינמיט", e: "TNT", i: "🧨" }, { h: "ספר", e: "Book", i: "📖" },
+        { h: "נייר", e: "Paper", i: "📄" }, { h: "עור", e: "Leather", i: "👞" }, { h: "נוצה", e: "Feather", i: "🪶" },
+        { h: "ביצה", e: "Egg", i: "🥚" }, { h: "חלב", e: "Milk", i: "🥛" }, { h: "סוכר", e: "Sugar", i: "🧂" },
+        { h: "ארנב", e: "Rabbit", i: "🐰" }
+    ];
+
+    let step = 0, score = 0;
+
+    function draw() {
+        if (step >= quiz.length) return end();
+        const cur = quiz[step];
+        const fakeOptions = ["Table", "Glass", "Stone", "Wood", "Stick", "Fire", "Water", "Cloud"];
+        const opts = [cur.e];
+        while(opts.length < 4) {
+            let r = fakeOptions[Math.floor(Math.random()*fakeOptions.length)];
+            if(!opts.includes(r)) opts.push(r);
+        }
+        opts.sort(() => Math.random() - 0.5);
+
+        game.innerHTML = `
+            <div style="position:absolute;top:20px;left:20px;font-size:20px;background:#333;padding:10px;border-radius:10px;">XP: ${score} ✨</div>
+            <h2 style="color:#888;">שלב ${step+1} מתוך ${quiz.length}</h2>
+            <h1 style="margin:10px;font-size:30px;">איך אומרים <span style="color:#f1c40f;">${cur.h}</span>?</h1>
+            <div style="font-size:90px;background:#222;padding:30px;border-radius:20px;margin:20px;box-shadow: 0 0 20px rgba(0,0,0,0.5);">${cur.i}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:320px;">
+                ${opts.map(o => `<button class="gb" style="padding:15px;cursor:pointer;background:#444;color:white;border:2px solid #666;font-weight:bold;border-radius:8px;">${o}</button>`).join('')}
+            </div>`;
+
+        game.querySelectorAll('.gb').forEach(b => {
+            b.onclick = () => {
+                if (b.innerText === cur.e) {
+                    score++;
+                    b.style.background = "#2ecc71";
+                } else {
+                    b.style.background = "#e74c3c";
+                }
+                setTimeout(() => { step++; draw(); }, 250);
+            };
+        });
+    }
+
+    function end() {
+        game.innerHTML = `
+            <div style="text-align:center; animation: fadeIn 1s ease-in;">
+                <h1 style="font-size:120px; margin:0; background: linear-gradient(45deg, #f1c40f, #e67e22); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(241,196,15,0.5));">67</h1>
+                <p style="font-size:24px; color:#aaa; margin-top:-10px;">VIBE CHECK PASSED</p>
+                <p style="font-size:28px; margin:20px 0;">צברת ${score} נקודות XP!</p>
+                <button id="restart-btn" style="padding:15px 40px; cursor:pointer; font-size:18px; font-weight:bold; background:white; color:black; border:none; border-radius:50px; transition: 0.3s; box-shadow: 0 4px 15px rgba(255,255,255,0.2);">סיבוב נוסף 🔥</button>
+            </div>
+            <style>
+                @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+                #restart-btn:hover { transform: scale(1.05); background: #f1c40f; }
+            </style>`;
+        
+        document.getElementById('restart-btn').onclick = () => {
+            step = 0; score = 0; draw();
+        };
+    }
+
+    draw();
+})();
